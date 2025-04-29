@@ -1,4 +1,5 @@
 mod integer;
+mod float;
 
 use core::fmt::{Debug, Display};
 use core::ops::{Add, Div, Mul, Sub};

@@ -1,54 +1,29 @@
-use crate::environment::Environment;
 use crate::number::Number;
-use crate::operation;
-use crate::operation::Operation;
+use crate::operation::{Operation, OperationError};
+use crate::stack::Stack;
 
 pub struct Push<N: Number> {
-    number: N,
+    value: N,
 }
 
 impl<N: Number> Push<N> {
-    pub fn new(number: N) -> Self {
-        Self { number }
+    pub fn new(value: N) -> Self {
+        Self { value }
     }
 }
 
-impl<N: Number, E: Environment<N>> Operation<N, E> for Push<N> {
-    fn evaluate(&self, environment: &mut E) -> Result<(), operation::Error> {
-        environment.push(self.number)?;
+impl<N: Number> Operation<N> for Push<N> {
+    fn evaluate(&self, stack: &mut impl Stack<N>) -> Result<(), OperationError<N>> {
+        stack.push(self.value)?;
         Ok(())
     }
 }
 
-pub struct Pop {}
+pub struct Pop;
 
-impl Pop {
-    pub fn new() -> Self {
-        Self {}
-    }
-}
-
-impl<N: Number, E: Environment<N>> Operation<N, E> for Pop {
-    fn evaluate(&self, environment: &mut E) -> Result<(), operation::Error> {
-        environment.pop()?;
-        Ok(())
-    }
-}
-
-pub struct Rotate {}
-
-impl Rotate {
-    pub fn new() -> Self {
-        Self {}
-    }
-}
-
-impl<N: Number, E: Environment<N>> Operation<N, E> for Rotate {
-    fn evaluate(&self, environment: &mut E) -> Result<(), operation::Error> {
-        let b = environment.pop()?;
-        let a = environment.pop()?;
-        environment.push(b)?;
-        environment.push(a)?;
+impl<N: Number> Operation<N> for Pop {
+    fn evaluate(&self, stack: &mut impl Stack<N>) -> Result<(), OperationError<N>> {
+        stack.pop()?;
         Ok(())
     }
 }
