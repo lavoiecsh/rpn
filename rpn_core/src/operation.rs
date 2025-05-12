@@ -7,8 +7,10 @@ mod mul;
 mod pop;
 mod push;
 mod sub;
+mod copy;
 
 pub use add::Add;
+pub use copy::Copy;
 pub use div::Div;
 pub use mul::Mul;
 pub use pop::Pop;

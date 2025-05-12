@@ -36,7 +36,7 @@ mod tests {
     }
     
     #[test]
-    fn push_returns_error_on_full_stack() {
+    fn push_errs_on_full_stack() {
         let stack = SmallStack::<i32>::two_elements(1, 2);
         let result = Push(3).evaluate(&stack);
         assert_matches!(result, Err(OperationError::Stack(StackError::StackSizeExceeded(2))));
