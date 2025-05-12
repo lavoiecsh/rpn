@@ -4,8 +4,8 @@ use crate::stack::Stack;
 
 /// Squares last number on the stack
 /// ```
-/// use rpn_core::operation::{OperationError, Push, Square};
-/// use rpn_core::stack::{SmallStack, Stack};
+/// # use rpn_core::operation::{OperationError, Push, Square};
+/// # use rpn_core::stack::{SmallStack, Stack};
 /// let stack = SmallStack::<i32>::default()
 ///     .evaluate(Push(3))?
 ///     .evaluate(Square)?;
