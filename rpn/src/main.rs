@@ -1,22 +1,19 @@
-use rpn_core::operation::basic_math::{Add, Div, Mul, Sub};
-use rpn_core::operation::stack_manipulation::{Pop, Push};
-use rpn_core::operation::{Operation, OperationError};
-use rpn_core::stack::large::LargeStack;
-use rpn_core::stack::Stack;
+use rpn_core::operation::{Add, Div, Mul, Operation, OperationError, Pop, Push, Sub};
+use rpn_core::stack::{LargeStack, Stack};
 use std::io::{Error, Write};
 
-type N = i64;
+type N = i32;
+type S = LargeStack<N>;
 
 fn main() {
-    let mut stack = LargeStack::new();
+    let mut stack = LargeStack::default();
     loop {
         match read() {
             Ok(operations) => {
                 for operation in operations {
-                    let result = evaluate(&operation, &mut stack);
-                    if let Err(e) = result {
-                        println!("Error evaluating command: {e:?}");
-                        break;
+                    match evaluate(&operation, &stack) {
+                        Ok(new_stack) => { stack = new_stack; },
+                        Err(e) => { println!("Error evaluating command: {e:?}") },
                     }
                 }
             }
@@ -55,7 +52,7 @@ fn read<'a>() -> Result<Vec<String>, ReplError<'a>> {
 enum ReplError<'a> {
     Exit,
     IO(Error),
-    Operation(&'a str, OperationError<N>),
+    Operation(&'a str, OperationError),
     UnknownOperation(&'a str),
 }
 
@@ -65,8 +62,8 @@ impl<'a> From<Error> for ReplError<'a> {
     }
 }
 
-fn evaluate<'a>(operation: &'a str, stack: &mut impl Stack<N>) -> Result<(), ReplError<'a>> {
-    let error_mapper = |o: OperationError<N>| ReplError::Operation(operation, o);
+fn evaluate<'a>(operation: &'a str, stack: &S) -> Result<S, ReplError<'a>> {
+    let error_mapper = |o: OperationError| ReplError::Operation(operation, o);
     match operation {
         "pop" => Pop.evaluate(stack).map_err(error_mapper),
         "+" => Add.evaluate(stack).map_err(error_mapper),
@@ -74,7 +71,7 @@ fn evaluate<'a>(operation: &'a str, stack: &mut impl Stack<N>) -> Result<(), Rep
         "*" => Mul.evaluate(stack).map_err(error_mapper),
         "/" => Div.evaluate(stack).map_err(error_mapper),
         _ => if let Ok(n) = operation.parse::<N>() {
-            Push::new(n).evaluate(stack).map_err(error_mapper)
+            Push(n).evaluate(stack).map_err(error_mapper)
         } else {
             Err(ReplError::UnknownOperation(operation))
         }
@@ -85,5 +82,5 @@ fn print(stack: &impl Stack<N>) {
     stack
         .iter()
         .enumerate()
-        .for_each(|(i,v)| println!("{:2}: {}", i, v));
+        .for_each(|(i,v)| println!("{i:2}: {v}"));
 }

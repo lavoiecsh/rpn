@@ -3,13 +3,14 @@ use crate::stack::{Stack, StackError};
 
 const MAX_STACK_SIZE: usize = 1024;
 
+#[derive(Clone)]
 pub struct LargeStack<N: Number> {
     stack: [N; MAX_STACK_SIZE],
     top: usize,
 }
 
-impl<N: Number> LargeStack<N> {
-    pub fn new() -> Self {
+impl<N: Number> Default for LargeStack<N> {
+    fn default() -> Self {
         Self {
             stack: [N::zero(); MAX_STACK_SIZE],
             top: 0,

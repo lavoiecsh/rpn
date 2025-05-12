@@ -1,14 +1,31 @@
 use crate::number::Number;
 use crate::stack::{Stack, StackError};
 
+#[derive(Clone, Debug)]
 pub struct SmallStack<N: Number> {
     a: Option<N>,
     b: Option<N>,
 }
 
-impl<N: Number> SmallStack<N> {
-    pub fn new() -> Self {
+impl<N: Number> Default for SmallStack<N> {
+    fn default() -> Self {
         Self { a: None, b: None }
+    }
+}
+
+impl<N: Number> SmallStack<N> {
+    #[cfg(test)]
+    pub(crate) fn one_element(a: N) -> Self {
+        Self { a: Some(a), b: None }
+    }
+    
+    #[cfg(test)]
+    pub(crate) fn two_elements(a: N, b: N) -> Self {
+        Self { a: Some(a), b: Some(b) }
+    }
+    
+    pub fn inspect(&self) -> (Option<N>, Option<N>) {
+        (self.a, self.b)
     }
 }
 

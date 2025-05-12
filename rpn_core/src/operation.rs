@@ -1,22 +1,39 @@
-use crate::number::Number;
+use crate::number::{Number, NumberError};
 use crate::stack::{Stack, StackError};
 
-pub mod basic_math;
-pub mod stack_manipulation;
+mod add;
+mod div;
+mod mul;
+mod pop;
+mod push;
+mod sub;
 
-pub trait Operation<N: Number> {
-    fn evaluate(&self, stack: &mut impl Stack<N>) -> Result<(), OperationError<N>>;
+pub use add::Add;
+pub use div::Div;
+pub use mul::Mul;
+pub use pop::Pop;
+pub use push::Push;
+pub use sub::Sub;
+
+pub trait Operation<N: Number, S: Stack<N>> {
+    fn evaluate(self, stack: &S) -> Result<S, OperationError>;
 }
 
 #[derive(Debug)]
-pub enum OperationError<N: Number> {
-    Overflow(N),
-    Underflow(N),
+pub enum OperationError {
+    NotEnoughElements(usize),
     Stack(StackError),
+    Number(NumberError),
 }
 
-impl<N: Number> From<StackError> for OperationError<N> {
+impl From<StackError> for OperationError {
     fn from(value: StackError) -> Self {
         Self::Stack(value)
+    }
+}
+
+impl From<NumberError> for OperationError {
+    fn from(value: NumberError) -> Self {
+        Self::Number(value)
     }
 }

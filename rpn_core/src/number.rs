@@ -2,7 +2,6 @@ mod integer;
 mod float;
 
 use core::fmt::{Debug, Display};
-use core::ops::{Add, Div, Mul, Sub};
 
 pub trait Number:
 Sized
@@ -10,10 +9,20 @@ Sized
 + Clone
 + Debug
 + Display
-+ Add<Output = Self>
-+ Sub<Output = Self>
-+ Mul<Output = Self>
-+ Div<Output = Self>
++ PartialOrd
 {
     fn zero() -> Self;
+    fn max() -> Self;
+    fn min() -> Self;
+    
+    fn add(&self, other: &Self) -> Result<Self, NumberError>;
+    fn sub(&self, other: &Self) -> Result<Self, NumberError>;
+    fn mul(&self, other: &Self) -> Result<Self, NumberError>;
+    fn div(&self, other: &Self) -> Result<Self, NumberError>;
+}
+
+#[derive(Debug)]
+pub enum NumberError {
+    Unchecked,
+    DivisionByZero,
 }
