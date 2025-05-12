@@ -4,8 +4,8 @@ use crate::stack::Stack;
 
 /// Copies the top of the stack
 /// ```
-/// use rpn_core::operation::{Copy, Operation, OperationError, Push};
-/// use rpn_core::stack::{SmallStack, Stack};
+/// # use rpn_core::operation::{Copy, Operation, OperationError, Push};
+/// # use rpn_core::stack::{SmallStack, Stack};
 /// let mut stack = SmallStack::<i32>::default();
 /// stack = Push(1).evaluate(&stack)?;
 /// stack = Copy.evaluate(&stack)?;

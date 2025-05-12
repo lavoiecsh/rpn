@@ -8,6 +8,7 @@ mod pop;
 mod push;
 mod sub;
 mod copy;
+mod rotate;
 
 pub use add::Add;
 pub use copy::Copy;
@@ -15,6 +16,7 @@ pub use div::Div;
 pub use mul::Mul;
 pub use pop::Pop;
 pub use push::Push;
+pub use rotate::Rotate;
 pub use sub::Sub;
 
 pub trait Operation<N: Number, S: Stack<N>> {
