@@ -35,4 +35,11 @@ mod tests {
         let result = stack.evaluate(Square);
         assert_matches!(result, Err(OperationError::Stack(StackError::Empty)));
     }
+    
+    #[test]
+    fn square_squares_top_of_stack() {
+        let stack = SmallStack::one_element(2);
+        let result = stack.evaluate(Square);
+        assert_matches!(result.unwrap().inspect(), (Some(4), None));
+    }
 }
