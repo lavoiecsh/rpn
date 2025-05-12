@@ -21,13 +21,12 @@ pub use remainder::Remainder;
 pub use rotate::Rotate;
 pub use subtract::Subtract;
 
-pub trait Operation<N: Number, S: Stack<N>> {
-    fn evaluate(self, stack: &S) -> Result<S, OperationError>;
+pub trait Operation<N: Number> {
+    fn evaluate(&self, stack: &mut impl Stack<N>) -> Result<(), OperationError>;
 }
 
 #[derive(Debug)]
 pub enum OperationError {
-    NotEnoughElements(usize),
     Stack(StackError),
     Number(NumberError),
 }

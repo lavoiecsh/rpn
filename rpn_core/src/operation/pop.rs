@@ -7,18 +7,17 @@ use crate::stack::Stack;
 /// # use rpn_core::operation::{Operation, OperationError, Pop, Push};
 /// # use rpn_core::stack::{SmallStack, Stack};
 /// let mut stack = SmallStack::<i32>::default();
-/// stack = Push(3).evaluate(&stack)?;
-/// stack = Pop.evaluate(&stack)?;
+/// stack = stack.evaluate(Push(3))?;
+/// stack = stack.evaluate(Pop)?;
 /// assert_eq!(stack.size(), 0);
 /// # Ok::<(), OperationError>(())
 /// ```
 pub struct Pop;
 
-impl<N: Number, S: Stack<N>> Operation<N, S> for Pop {
-    fn evaluate(self, stack: &S) -> Result<S, OperationError> {
-        let mut stack = stack.clone();
+impl<N: Number> Operation<N> for Pop {
+    fn evaluate(&self, stack: &mut impl Stack<N>) -> Result<(), OperationError> {
         stack.pop()?;
-        Ok(stack)
+        Ok(())
     }
 }
 
@@ -31,14 +30,14 @@ mod tests {
     #[test]
     fn pop_errs_on_0_element_stack() {
         let stack = SmallStack::<i32>::default();
-        let result = Pop.evaluate(&stack);
-        assert_matches!(result, Err(OperationError::Stack(StackError::EmptyStack)));
+        let result = stack.evaluate(Pop);
+        assert_matches!(result, Err(OperationError::Stack(StackError::Empty)));
     }
     
     #[test]
     fn pop_removes_last_element_from_stack() {
         let stack = SmallStack::<i32>::one_element(3);
-        let new_stack = Pop.evaluate(&stack).unwrap();
-        assert_matches!(new_stack.inspect(), (None, None));
+        let new_stack = stack.evaluate(Pop);
+        assert_matches!(new_stack.unwrap().inspect(), (None, None));
     }
 }

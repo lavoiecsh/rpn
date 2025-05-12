@@ -1,4 +1,4 @@
-use rpn_core::operation::{Add, Divide, Multiply, Operation, OperationError, Pop, Push, Subtract};
+use rpn_core::operation::{Add, Copy, Divide, Multiply, OperationError, Pop, Push, Remainder, Rotate, Subtract};
 use rpn_core::stack::{LargeStack, Stack};
 use std::io::{Error, Write};
 
@@ -65,13 +65,16 @@ impl<'a> From<Error> for ReplError<'a> {
 fn evaluate<'a>(operation: &'a str, stack: &S) -> Result<S, ReplError<'a>> {
     let error_mapper = |o: OperationError| ReplError::Operation(operation, o);
     match operation {
-        "pop" => Pop.evaluate(stack).map_err(error_mapper),
-        "+" => Add.evaluate(stack).map_err(error_mapper),
-        "-" => Subtract.evaluate(stack).map_err(error_mapper),
-        "*" => Multiply.evaluate(stack).map_err(error_mapper),
-        "/" => Divide.evaluate(stack).map_err(error_mapper),
+        "+" => stack.evaluate(Add).map_err(error_mapper),
+        "-" => stack.evaluate(Subtract).map_err(error_mapper),
+        "*" => stack.evaluate(Multiply).map_err(error_mapper),
+        "/" => stack.evaluate(Divide).map_err(error_mapper),
+        "%" => stack.evaluate(Remainder).map_err(error_mapper),
+        "pop" => stack.evaluate(Pop).map_err(error_mapper),
+        "rot" => stack.evaluate(Rotate).map_err(error_mapper),
+        "copy" => stack.evaluate(Copy).map_err(error_mapper),
         _ => if let Ok(n) = operation.parse::<N>() {
-            Push(n).evaluate(stack).map_err(error_mapper)
+            stack.evaluate(Push(n)).map_err(error_mapper)
         } else {
             Err(ReplError::UnknownOperation(operation))
         }

@@ -61,7 +61,7 @@ impl<N: Number> Stack<N> for SmallStack<N> {
                 self.b = Some(value);
                 Ok(())
             }
-            (Some(_), Some(_)) => Err(StackError::StackSizeExceeded(2)),
+            (Some(_), Some(_)) => Err(StackError::SizeExceeded(2)),
             (None, Some(_b)) => {
                 unreachable!("invalid state within SmallStackEnvironment: (None, {_b:?})")
             }
@@ -70,7 +70,7 @@ impl<N: Number> Stack<N> for SmallStack<N> {
 
     fn pop(&mut self) -> Result<N, StackError> {
         match (self.a, self.b) {
-            (None, None) => Err(StackError::EmptyStack),
+            (None, None) => Err(StackError::Empty),
             (Some(a), None) => {
                 self.a = None;
                 Ok(a)

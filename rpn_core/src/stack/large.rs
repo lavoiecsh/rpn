@@ -32,7 +32,7 @@ impl<N: Number> Stack<N> for LargeStack<N> {
 
     fn push(&mut self, value: N) -> Result<(), StackError> {
         if self.top == MAX_STACK_SIZE {
-            Err(StackError::StackSizeExceeded(MAX_STACK_SIZE))
+            Err(StackError::SizeExceeded(MAX_STACK_SIZE))
         } else {
             self.stack[self.top] = value;
             self.top += 1;
@@ -42,7 +42,7 @@ impl<N: Number> Stack<N> for LargeStack<N> {
 
     fn pop(&mut self) -> Result<N, StackError> {
         if self.top == 0 {
-            Err(StackError::EmptyStack)
+            Err(StackError::Empty)
         } else {
             self.top -= 1;
             Ok(self.stack[self.top])
