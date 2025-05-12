@@ -2,14 +2,15 @@ use crate::number::{Number, NumberError};
 use crate::stack::{Stack, StackError};
 
 mod add;
+mod copy;
 mod divide;
 mod multiply;
 mod pop;
 mod push;
-mod subtract;
-mod copy;
-mod rotate;
 mod remainder;
+mod rotate;
+mod square;
+mod subtract;
 
 pub use add::Add;
 pub use copy::Copy;
@@ -19,6 +20,7 @@ pub use pop::Pop;
 pub use push::Push;
 pub use remainder::Remainder;
 pub use rotate::Rotate;
+pub use square::Square;
 pub use subtract::Subtract;
 
 pub trait Operation<N: Number> {
