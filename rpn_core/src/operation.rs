@@ -2,24 +2,24 @@ use crate::number::{Number, NumberError};
 use crate::stack::{Stack, StackError};
 
 mod add;
-mod div;
-mod mul;
+mod divide;
+mod multiply;
 mod pop;
 mod push;
-mod sub;
+mod subtract;
 mod copy;
 mod rotate;
 mod remainder;
 
 pub use add::Add;
 pub use copy::Copy;
-pub use div::Div;
-pub use mul::Mul;
+pub use divide::Divide;
+pub use multiply::Multiply;
 pub use pop::Pop;
 pub use push::Push;
 pub use remainder::Remainder;
 pub use rotate::Rotate;
-pub use sub::Sub;
+pub use subtract::Subtract;
 
 pub trait Operation<N: Number, S: Stack<N>> {
     fn evaluate(self, stack: &S) -> Result<S, OperationError>;

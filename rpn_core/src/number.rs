@@ -16,9 +16,9 @@ Sized
     fn min() -> Self;
     
     fn add(&self, other: &Self) -> Result<Self, NumberError>;
-    fn sub(&self, other: &Self) -> Result<Self, NumberError>;
-    fn mul(&self, other: &Self) -> Result<Self, NumberError>;
-    fn div(&self, other: &Self) -> Result<Self, NumberError>;
+    fn subtract(&self, other: &Self) -> Result<Self, NumberError>;
+    fn multiply(&self, other: &Self) -> Result<Self, NumberError>;
+    fn divide(&self, other: &Self) -> Result<Self, NumberError>;
     fn remainder(&self, other: &Self) -> Result<Self, NumberError>;
 }
 

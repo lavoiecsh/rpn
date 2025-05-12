@@ -1,4 +1,4 @@
-use rpn_core::operation::{Add, Div, Mul, Operation, OperationError, Pop, Push, Sub};
+use rpn_core::operation::{Add, Divide, Multiply, Operation, OperationError, Pop, Push, Subtract};
 use rpn_core::stack::{LargeStack, Stack};
 use std::io::{Error, Write};
 
@@ -67,9 +67,9 @@ fn evaluate<'a>(operation: &'a str, stack: &S) -> Result<S, ReplError<'a>> {
     match operation {
         "pop" => Pop.evaluate(stack).map_err(error_mapper),
         "+" => Add.evaluate(stack).map_err(error_mapper),
-        "-" => Sub.evaluate(stack).map_err(error_mapper),
-        "*" => Mul.evaluate(stack).map_err(error_mapper),
-        "/" => Div.evaluate(stack).map_err(error_mapper),
+        "-" => Subtract.evaluate(stack).map_err(error_mapper),
+        "*" => Multiply.evaluate(stack).map_err(error_mapper),
+        "/" => Divide.evaluate(stack).map_err(error_mapper),
         _ => if let Ok(n) = operation.parse::<N>() {
             Push(n).evaluate(stack).map_err(error_mapper)
         } else {

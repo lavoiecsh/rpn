@@ -11,15 +11,15 @@ macro_rules! impl_number_for_integer {
                 self.checked_add(*other).ok_or(NumberError::Unchecked)
             }
 
-            fn sub(&self, other: &Self) -> Result<Self, NumberError> {
+            fn subtract(&self, other: &Self) -> Result<Self, NumberError> {
                 self.checked_sub(*other).ok_or(NumberError::Unchecked)
             }
 
-            fn mul(&self, other: &Self) -> Result<Self, NumberError> {
+            fn multiply(&self, other: &Self) -> Result<Self, NumberError> {
                 self.checked_mul(*other).ok_or(NumberError::Unchecked)
             }
 
-            fn div(&self, other: &Self) -> Result<Self, NumberError> {
+            fn divide(&self, other: &Self) -> Result<Self, NumberError> {
                 if other == &Self::zero() {
                     return Err(NumberError::DivisionByZero);
                 }

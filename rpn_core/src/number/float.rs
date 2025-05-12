@@ -16,7 +16,7 @@ macro_rules! impl_number_for_float {
                 }
             }
 
-            fn sub(&self, other: &Self) -> Result<Self, NumberError> {
+            fn subtract(&self, other: &Self) -> Result<Self, NumberError> {
                 let answer = *self - *other;
                 if answer.is_infinite() {
                     Err(NumberError::Unchecked)
@@ -25,7 +25,7 @@ macro_rules! impl_number_for_float {
                 }
             }
 
-            fn mul(&self, other: &Self) -> Result<Self, NumberError> {
+            fn multiply(&self, other: &Self) -> Result<Self, NumberError> {
                 let answer = *self * *other;
                 if answer.is_infinite() {
                     Err(NumberError::Unchecked)
@@ -34,7 +34,7 @@ macro_rules! impl_number_for_float {
                 }
             }
 
-            fn div(&self, other: &Self) -> Result<Self, NumberError> {
+            fn divide(&self, other: &Self) -> Result<Self, NumberError> {
                 if other == &Self::zero() {
                     return Err(NumberError::DivisionByZero);
                 }
