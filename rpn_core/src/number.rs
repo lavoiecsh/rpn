@@ -19,6 +19,7 @@ Sized
     fn sub(&self, other: &Self) -> Result<Self, NumberError>;
     fn mul(&self, other: &Self) -> Result<Self, NumberError>;
     fn div(&self, other: &Self) -> Result<Self, NumberError>;
+    fn remainder(&self, other: &Self) -> Result<Self, NumberError>;
 }
 
 #[derive(Debug)]

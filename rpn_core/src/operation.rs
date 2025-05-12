@@ -9,6 +9,7 @@ mod push;
 mod sub;
 mod copy;
 mod rotate;
+mod remainder;
 
 pub use add::Add;
 pub use copy::Copy;
@@ -16,6 +17,7 @@ pub use div::Div;
 pub use mul::Mul;
 pub use pop::Pop;
 pub use push::Push;
+pub use remainder::Remainder;
 pub use rotate::Rotate;
 pub use sub::Sub;
 

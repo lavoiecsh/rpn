@@ -45,6 +45,18 @@ macro_rules! impl_number_for_float {
                     Ok(answer)
                 }
             }
+            
+            fn remainder(&self, other: &Self) -> Result<Self, NumberError> {
+                if other == &Self::zero() {
+                    return Err(NumberError::DivisionByZero);
+                }
+                let answer = *self % *other;
+                if answer.is_infinite() {
+                    Err(NumberError::Unchecked)
+                } else {
+                    Ok(answer)
+                }
+            }
         }
     }
 }
