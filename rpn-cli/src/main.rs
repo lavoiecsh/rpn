@@ -1,12 +1,13 @@
 use rpn_core::operation::{Add, Copy, Divide, Multiply, OperationError, Pop, Push, Remainder, Rotate, Subtract};
-use rpn_core::stack::{LargeStack, Stack};
+use rpn_core::stack::Stack;
+use rpn_std::stack::VecStack;
 use std::io::{Error, Write};
 
 type N = i32;
-type S = LargeStack<N>;
+type S = VecStack<N>;
 
 fn main() {
-    let mut stack = LargeStack::default();
+    let mut stack = VecStack::default();
     loop {
         match read() {
             Ok(operations) => {

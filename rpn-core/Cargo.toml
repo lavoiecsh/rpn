@@ -1,6 +1,5 @@
 [package]
-name = "rpn_core"
-version = "0.1.0"
+name = "rpn-core"
 edition = "2024"
 
 [dependencies]

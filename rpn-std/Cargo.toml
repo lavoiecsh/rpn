@@ -1,0 +1,6 @@
+[package]
+name = "rpn-std"
+edition = "2024"
+
+[dependencies]
+rpn-core = { path = "../rpn-core" }

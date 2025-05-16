@@ -1,5 +1,5 @@
 #![no_std]
-#![feature(assert_matches)]
+#![cfg_attr(test, feature(assert_matches))]
 pub mod operation;
 pub mod number;
 pub mod stack;
