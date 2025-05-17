@@ -1,3 +1,3 @@
 [workspace]
 resolver = "2"
-members = ["rpn-cli", "rpn-core", "rpn-std"]
+members = ["rpn-cli", "rpn-core", "rpn-std", "rpn-wasm"]
