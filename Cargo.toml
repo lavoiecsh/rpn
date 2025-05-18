@@ -1,3 +1,5 @@
 [workspace]
-resolver = "2"
+resolver = "3"
 members = ["rpn-cli", "rpn-core", "rpn-std", "rpn-wasm"]
+
+[workspace.dependencies]
