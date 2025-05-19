@@ -69,16 +69,6 @@ impl WasmStack {
     }
 
     fn evaluate_result(&self, input: char) -> Result<VecStack<i32>, WasmError> {
-        // todo autofocus input on start
-        // todo handle <tab> for rotate
-        // todo handle <enter> for push
-        // todo don't add <space>/<enter> in history
-        // todo change <tab> in history
-        // todo add error message display
-        // todo support dark mode
-        // todo prettify UI
-        // todo deploy to lavoiecsh.github.io
-        // todo add GitHub Actions to build/test
         match input {
             '+' => Ok(self.stack.evaluate(Add)?),
             '-' => Ok(self.stack.evaluate(Subtract)?),
