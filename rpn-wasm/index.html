@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <title>RPN</title>
     <script type="module">
-        import init, { WasmStack } from './pkg/rpn_wasm.js';
+        import init, {WasmStack} from './pkg/rpn_wasm.js';
+
         await init();
 
         const stack = new WasmStack();
         let number = undefined;
-        
+
         function push() {
             if (number === undefined) {
                 return;
@@ -30,15 +31,19 @@
             push();
             stack.evaluate(event.data);
             document.getElementById('input').value = '';
-            document.getElementById('output').innerHTML = stack.stack().join('<br/>');
+            document.getElementById('stack').innerHTML = stack.stack().join('<br/>');
+            document.getElementById('history').innerHTML = stack.history().join('<br/>');
         }
 
         document.getElementById('input').addEventListener('input', evaluate);
+        document.getElementById('input').focus();
     </script>
 </head>
 <body>
-<label for="input">Expression</label>
-<input id="input" type="text">
-<div id="output"></div>
+<div id="stack"></div>
+<div>
+    <label for="input"></label><input id="input" type="text">
+</div>
+<div id="history"></div>
 </body>
 </html>
