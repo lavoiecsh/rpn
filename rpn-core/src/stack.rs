@@ -1,6 +1,8 @@
 mod large;
 mod small;
 
+use core::error::Error;
+use core::fmt::{Display, Formatter};
 pub use large::LargeStack;
 pub use small::SmallStack;
 
@@ -27,3 +29,14 @@ pub enum StackError {
     Empty,
     SizeExceeded(usize),
 }
+
+impl Display for StackError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match *self {
+            StackError::Empty => f.write_str("Empty stack"),
+            StackError::SizeExceeded(size) => f.write_fmt(format_args!("Size Exceeded: {size}")),
+        }
+    }
+}
+
+impl Error for StackError {}

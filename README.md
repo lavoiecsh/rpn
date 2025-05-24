@@ -2,17 +2,11 @@
 Rust Reverse Polish Notation Calculator
 
 ### Number systems
-- integer
-- float
+- integer (decimal, binary, hexadecimal, scientific, 2's complement)
+- float (decimal, scientific)
 - fractional (todo)
 - infinite integer (todo)
 - infinite fractional (todo)
-
-### Display systems (todo)
-- Decimal (todo)
-- Binary (todo)
-- Hexadecimal (todo)
-- Scientific (todo)
 
 ### Number scales (todo)
 - Real

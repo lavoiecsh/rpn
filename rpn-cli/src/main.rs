@@ -1,90 +1,94 @@
-use rpn_core::operation::{Add, Copy, Divide, Multiply, OperationError, Pop, Push, Remainder, Rotate, Subtract};
+use std::{error, io};
+use rpn_core::number::Number;
+use rpn_core::operation::{
+    Add, Copy, Divide, Multiply, Pop, Push, Remainder, Rotate, Subtract,
+};
 use rpn_core::stack::Stack;
 use rpn_std::stack::VecStack;
-use std::io::{Error, Write};
+use std::fmt::{Display, Formatter};
+use std::io::Write;
+use std::str::FromStr;
 
-type N = i32;
-type S = VecStack<N>;
-
-fn main() {
-    let mut stack = VecStack::default();
-    loop {
-        match read() {
-            Ok(operations) => {
-                for operation in operations {
-                    match evaluate(&operation, &stack) {
-                        Ok(new_stack) => { stack = new_stack; },
-                        Err(e) => { println!("Error evaluating command: {e:?}") },
-                    }
-                }
-            }
-            Err(ReplError::Exit) => {
-                println!("Exiting.");
-                std::process::exit(0);
-            }
-            Err(ReplError::IO(error)) => {
-                println!("Error parsing input: {error}");
-            }
-            Err(ReplError::UnknownOperation(op)) => {
-                println!("Unknown operation: {op}");
-            }
-            Err(ReplError::Operation(op, error)) => {
-                println!("Error evaluating {op}: {error:?}");
-            }
+fn main() -> Result<(), io::Error> {
+    let mut environment = CliEnvironment::<i32>::default();
+    let mut input = String::new();
+    while !environment.exited {
+        print!("> ");
+        io::stdout().flush()?;
+        io::stdin().read_line(&mut input)?;
+        for operation in input.split_whitespace() {
+            environment.evaluate(operation);
         }
-        print(&stack);
+        input.clear();
+        environment.print();
+    }
+    Ok(())
+}
+
+struct CliEnvironment<N: Number> {
+    stack: VecStack<N>,
+    exited: bool,
+}
+
+impl<N: Number> Default for CliEnvironment<N> {
+    fn default() -> Self {
+        Self {
+            stack: VecStack::default(),
+            exited: false,
+        }
     }
 }
 
-fn read<'a>() -> Result<Vec<String>, ReplError<'a>> {
-    print!("> ");
-    std::io::stdout().flush()?;
-    let mut input = String::new();
-    std::io::stdin().read_line(&mut input)?;
-    if input.contains("exit") {
-        return Err(ReplError::Exit);
+impl<N: Number + Display + FromStr> CliEnvironment<N> {
+    fn print(&self) {
+        self.stack
+            .iter()
+            .enumerate()
+            .for_each(|(i, v)| println!("{i:2}: {v}"));
     }
-    Ok(input.split_whitespace()
-        .map(String::from)
-        .collect::<Vec<_>>())
+    
+    fn evaluate(&mut self, input: &str) {
+        match input {
+            "exit" => self.exited = true,
+            _ => match self.evaluate_result(input) {
+                Ok(new_stack) => {
+                    self.stack = new_stack;
+                }
+                Err(e) => {
+                    println!("{e}");
+                }
+            }
+        }
+    }
+
+    fn evaluate_result(&self, input: &str) -> Result<VecStack<N>, Box<dyn error::Error>> {
+        match input {
+            "+" => Ok(self.stack.evaluate(Add)?),
+            "-" => Ok(self.stack.evaluate(Subtract)?),
+            "*" => Ok(self.stack.evaluate(Multiply)?),
+            "/" => Ok(self.stack.evaluate(Divide)?),
+            "%" => Ok(self.stack.evaluate(Remainder)?),
+            "pop" => Ok(self.stack.evaluate(Pop)?),
+            "rot" => Ok(self.stack.evaluate(Rotate)?),
+            "copy" => Ok(self.stack.evaluate(Copy)?),
+            _ => {
+                if let Ok(n) = input.parse::<N>() {
+                    Ok(self.stack.evaluate(Push(n))?)
+                } else {
+                    Err(Box::new(CliError(format!("Invalid operation: {input}"))))
+                }
+            }
+        }
+    }
 }
 
 #[derive(Debug)]
-enum ReplError<'a> {
-    Exit,
-    IO(Error),
-    Operation(&'a str, OperationError),
-    UnknownOperation(&'a str),
-}
+struct CliError(String);
 
-impl<'a> From<Error> for ReplError<'a> {
-    fn from(value: Error) -> Self {
-        ReplError::IO(value)
+impl Display for CliError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
     }
 }
 
-fn evaluate<'a>(operation: &'a str, stack: &S) -> Result<S, ReplError<'a>> {
-    let error_mapper = |o: OperationError| ReplError::Operation(operation, o);
-    match operation {
-        "+" => stack.evaluate(Add).map_err(error_mapper),
-        "-" => stack.evaluate(Subtract).map_err(error_mapper),
-        "*" => stack.evaluate(Multiply).map_err(error_mapper),
-        "/" => stack.evaluate(Divide).map_err(error_mapper),
-        "%" => stack.evaluate(Remainder).map_err(error_mapper),
-        "pop" => stack.evaluate(Pop).map_err(error_mapper),
-        "rot" => stack.evaluate(Rotate).map_err(error_mapper),
-        "copy" => stack.evaluate(Copy).map_err(error_mapper),
-        _ => if let Ok(n) = operation.parse::<N>() {
-            stack.evaluate(Push(n)).map_err(error_mapper)
-        } else {
-            Err(ReplError::UnknownOperation(operation))
-        }
-    }
-}
-
-fn print(stack: &impl Stack<N>) {
-    stack
-        .iter()
-        .enumerate()
-        .for_each(|(i,v)| println!("{i:2}: {v}"));
-}
+impl error::Error for CliError {}

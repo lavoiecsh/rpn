@@ -1,3 +1,5 @@
+use core::error::Error;
+use core::fmt::{Display, Formatter};
 use crate::number::{Number, NumberError};
 use crate::stack::{Stack, StackError};
 
@@ -42,5 +44,23 @@ impl From<StackError> for OperationError {
 impl From<NumberError> for OperationError {
     fn from(value: NumberError) -> Self {
         Self::Number(value)
+    }
+}
+
+impl Display for OperationError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match *self {
+            OperationError::Stack(ref e) => f.write_fmt(format_args!("Stack error: {e}")),
+            OperationError::Number(ref e) => f.write_fmt(format_args!("Number error: {e}")),
+        }
+    }
+}
+
+impl Error for OperationError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match *self {
+            OperationError::Stack(ref e) => Some(e),
+            OperationError::Number(ref e) => Some(e),
+        }
     }
 }

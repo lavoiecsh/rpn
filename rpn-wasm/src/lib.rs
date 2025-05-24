@@ -1,21 +1,21 @@
-use rpn_core::number::NumberError;
 use rpn_core::operation::{
-    Add, Divide, Multiply, OperationError, Pop, Push, Remainder, Rotate, Square, Subtract,
+    Add, Divide, Multiply, Pop, Push, Remainder, Rotate, Square, Subtract,
 };
-use rpn_core::stack::{Stack, StackError};
+use rpn_core::stack::Stack;
 use rpn_std::stack::VecStack;
+use std::fmt::{Display, Formatter};
 use wasm_bindgen::prelude::wasm_bindgen;
 use web_sys::console;
 
 #[wasm_bindgen]
-pub struct WasmStack {
+pub struct WasmEnvironment {
     stack: VecStack<i32>,
     history: Vec<String>,
 }
 
 #[allow(clippy::new_without_default)]
 #[wasm_bindgen]
-impl WasmStack {
+impl WasmEnvironment {
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         Self {
@@ -26,13 +26,14 @@ impl WasmStack {
 
     #[wasm_bindgen]
     pub fn stack(&self) -> Vec<String> {
-        self.stack.iter()
+        self.stack
+            .iter()
             .cloned()
             .enumerate()
-            .map(|(i,v)| format!("{i:3}: {v}"))
+            .map(|(i, v)| format!("{i:3}: {v}"))
             .collect()
     }
-    
+
     #[wasm_bindgen]
     pub fn history(&self) -> Vec<String> {
         self.history.clone()
@@ -46,12 +47,12 @@ impl WasmStack {
                 self.history.push(format!("{value}"));
             }
             Err(e) => {
-                console::error_1(&e.0.into());
+                console::error_1(&format!("{e}").into());
             }
         }
     }
 
-    fn push_result(&self, value: i32) -> Result<VecStack<i32>, WasmError> {
+    fn push_result(&self, value: i32) -> Result<VecStack<i32>, Box<dyn std::error::Error>> {
         Ok(self.stack.evaluate(Push(value))?)
     }
 
@@ -63,12 +64,12 @@ impl WasmStack {
                 self.history.push(format!("{input}"));
             }
             Err(e) => {
-                console::error_1(&e.0.into());
+                console::error_1(&format!("{e}").into());
             }
         }
     }
 
-    fn evaluate_result(&self, input: char) -> Result<VecStack<i32>, WasmError> {
+    fn evaluate_result(&self, input: char) -> Result<VecStack<i32>, Box<dyn std::error::Error>> {
         match input {
             '+' => Ok(self.stack.evaluate(Add)?),
             '-' => Ok(self.stack.evaluate(Subtract)?),
@@ -79,26 +80,18 @@ impl WasmStack {
             'p' => Ok(self.stack.evaluate(Pop)?),
             '\t' => Ok(self.stack.evaluate(Rotate)?),
             ' ' => Ok(self.stack.clone()),
-            _ => Err(WasmError(format!("invalid operation {input}"))),
+            _ => Err(Box::new(WasmError(format!("Invalid operation: {input}")))),
         }
     }
 }
 
+#[derive(Debug)]
 struct WasmError(String);
 
-impl From<OperationError> for WasmError {
-    fn from(value: OperationError) -> Self {
-        WasmError(match value {
-            OperationError::Stack(StackError::Empty) => String::from("Stack is empty"),
-            OperationError::Stack(StackError::SizeExceeded(n)) => {
-                format!("Stack size exceeded, maximum = {n}")
-            }
-            OperationError::Number(NumberError::DivisionByZero) => {
-                String::from("Invalid division by zero")
-            }
-            OperationError::Number(NumberError::Unchecked) => {
-                String::from("Number underflowed or overflowed")
-            }
-        })
+impl Display for WasmError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
     }
 }
+
+impl std::error::Error for WasmError {}
