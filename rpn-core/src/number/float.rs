@@ -3,9 +3,11 @@ use crate::number::{Number, NumberError};
 macro_rules! impl_number_for_float {
     ($T:ty) => {
         impl Number for $T {
-            fn zero() -> Self { 0. }
-            fn max() -> Self { Self::MAX }
-            fn min() -> Self { Self::MIN }
+            const ZERO: Self = 0.;
+            const ONE: Self = 1.;
+            const TEN: Self = 10.;
+            const MAX: Self = Self::MAX;
+            const MIN: Self = Self::MIN;
 
             fn add(&self, other: &Self) -> Result<Self, NumberError> {
                 let answer = *self + *other;
@@ -35,7 +37,7 @@ macro_rules! impl_number_for_float {
             }
 
             fn divide(&self, other: &Self) -> Result<Self, NumberError> {
-                if other == &Self::zero() {
+                if other == &Self::ZERO {
                     return Err(NumberError::DivisionByZero);
                 }
                 let answer = *self / *other;
@@ -47,7 +49,7 @@ macro_rules! impl_number_for_float {
             }
             
             fn remainder(&self, other: &Self) -> Result<Self, NumberError> {
-                if other == &Self::zero() {
+                if other == &Self::ZERO {
                     return Err(NumberError::DivisionByZero);
                 }
                 let answer = *self % *other;

@@ -3,9 +3,11 @@ use crate::number::{Number, NumberError};
 macro_rules! impl_number_for_integer {
     ($T:ty) => {
         impl Number for $T {
-            fn zero() -> Self { 0 }
-            fn max() -> Self { Self::MAX }
-            fn min() -> Self { Self::MIN }
+            const ZERO: Self = 0;
+            const ONE: Self = 1;
+            const TEN: Self = 10;
+            const MAX: Self = Self::MAX;
+            const MIN: Self = Self::MIN;
 
             fn add(&self, other: &Self) -> Result<Self, NumberError> {
                 self.checked_add(*other).ok_or(NumberError::Unchecked)
@@ -20,14 +22,14 @@ macro_rules! impl_number_for_integer {
             }
 
             fn divide(&self, other: &Self) -> Result<Self, NumberError> {
-                if other == &Self::zero() {
+                if other == &Self::ZERO {
                     return Err(NumberError::DivisionByZero);
                 }
                 self.checked_div(*other).ok_or(NumberError::Unchecked)
             }
 
             fn remainder(&self, other: &Self) -> Result<Self, NumberError> {
-                if other == &Self::zero() {
+                if other == &Self::ZERO {
                     return Err(NumberError::DivisionByZero);
                 }
                 self.checked_rem(*other).ok_or(NumberError::Unchecked)

@@ -5,9 +5,11 @@ use core::error::Error;
 use core::fmt::{Debug, Display, Formatter};
 
 pub trait Number: Sized + Copy + Clone + Debug + PartialOrd {
-    fn zero() -> Self;
-    fn max() -> Self;
-    fn min() -> Self;
+    const ZERO: Self;
+    const ONE: Self;
+    const TEN: Self;
+    const MIN: Self;
+    const MAX: Self;
 
     fn add(&self, other: &Self) -> Result<Self, NumberError>;
     fn subtract(&self, other: &Self) -> Result<Self, NumberError>;

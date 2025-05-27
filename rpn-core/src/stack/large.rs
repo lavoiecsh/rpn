@@ -12,7 +12,7 @@ pub struct LargeStack<N: Number> {
 impl<N: Number> Default for LargeStack<N> {
     fn default() -> Self {
         Self {
-            stack: [N::zero(); MAX_STACK_SIZE],
+            stack: [N::ZERO; MAX_STACK_SIZE],
             top: 0,
         }
     }
