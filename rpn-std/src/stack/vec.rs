@@ -1,18 +1,19 @@
-use rpn_core::number::Number;
 use rpn_core::stack::{Stack, StackError};
 
 #[derive(Clone)]
-pub struct VecStack<N: Number> {
+pub struct VecStack<N: Clone> {
     stack: Vec<N>,
 }
 
-impl<N: Number> Default for VecStack<N> {
+impl<N: Clone> Default for VecStack<N> {
     fn default() -> Self {
         Self { stack: Vec::new() }
     }
 }
 
-impl<N: Number> Stack<N> for VecStack<N> {
+impl<N: Clone> Stack for VecStack<N> {
+    type Item = N;
+    
     fn size(&self) -> usize {
         self.stack.len()
     }

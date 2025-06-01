@@ -3,6 +3,7 @@ mod integer;
 
 use core::error::Error;
 use core::fmt::{Debug, Display, Formatter};
+use crate::operation::OperationError;
 
 pub trait Number: Sized + Copy + Clone + Debug + PartialOrd {
     const ZERO: Self;
@@ -11,11 +12,11 @@ pub trait Number: Sized + Copy + Clone + Debug + PartialOrd {
     const MIN: Self;
     const MAX: Self;
 
-    fn add(&self, other: &Self) -> Result<Self, NumberError>;
-    fn subtract(&self, other: &Self) -> Result<Self, NumberError>;
-    fn multiply(&self, other: &Self) -> Result<Self, NumberError>;
-    fn divide(&self, other: &Self) -> Result<Self, NumberError>;
-    fn remainder(&self, other: &Self) -> Result<Self, NumberError>;
+    fn add(self, other: Self) -> Result<Self, OperationError>;
+    fn subtract(self, other: Self) -> Result<Self, OperationError>;
+    fn multiply(self, other: Self) -> Result<Self, OperationError>;
+    fn divide(self, other: Self) -> Result<Self, OperationError>;
+    fn remainder(self, other: Self) -> Result<Self, OperationError>;
 }
 
 #[derive(Debug)]

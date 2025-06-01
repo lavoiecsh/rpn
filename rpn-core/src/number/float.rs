@@ -1,4 +1,5 @@
 use crate::number::{Number, NumberError};
+use crate::operation::OperationError;
 
 macro_rules! impl_number_for_float {
     ($T:ty) => {
@@ -9,52 +10,52 @@ macro_rules! impl_number_for_float {
             const MAX: Self = Self::MAX;
             const MIN: Self = Self::MIN;
 
-            fn add(&self, other: &Self) -> Result<Self, NumberError> {
-                let answer = *self + *other;
+            fn add(self, other: Self) -> Result<Self, OperationError> {
+                let answer = self + other;
                 if answer.is_infinite() {
-                    Err(NumberError::Unchecked)
+                    Err(NumberError::Unchecked.into())
                 } else {
                     Ok(answer)
                 }
             }
 
-            fn subtract(&self, other: &Self) -> Result<Self, NumberError> {
-                let answer = *self - *other;
+            fn subtract(self, other: Self) -> Result<Self, OperationError> {
+                let answer = self - other;
                 if answer.is_infinite() {
-                    Err(NumberError::Unchecked)
+                    Err(NumberError::Unchecked.into())
                 } else {
                     Ok(answer)
                 }
             }
 
-            fn multiply(&self, other: &Self) -> Result<Self, NumberError> {
-                let answer = *self * *other;
+            fn multiply(self, other: Self) -> Result<Self, OperationError> {
+                let answer = self * other;
                 if answer.is_infinite() {
-                    Err(NumberError::Unchecked)
+                    Err(NumberError::Unchecked.into())
                 } else {
                     Ok(answer)
                 }
             }
 
-            fn divide(&self, other: &Self) -> Result<Self, NumberError> {
-                if other == &Self::ZERO {
-                    return Err(NumberError::DivisionByZero);
+            fn divide(self, other: Self) -> Result<Self, OperationError> {
+                if other == Self::ZERO {
+                    return Err(NumberError::DivisionByZero.into());
                 }
-                let answer = *self / *other;
+                let answer = self / other;
                 if answer.is_infinite() {
-                    Err(NumberError::Unchecked)
+                    Err(NumberError::Unchecked.into())
                 } else {
                     Ok(answer)
                 }
             }
             
-            fn remainder(&self, other: &Self) -> Result<Self, NumberError> {
-                if other == &Self::ZERO {
-                    return Err(NumberError::DivisionByZero);
+            fn remainder(self, other: Self) -> Result<Self, OperationError> {
+                if other == Self::ZERO {
+                    return Err(NumberError::DivisionByZero.into());
                 }
-                let answer = *self % *other;
+                let answer = self % other;
                 if answer.is_infinite() {
-                    Err(NumberError::Unchecked)
+                    Err(NumberError::Unchecked.into())
                 } else {
                     Ok(answer)
                 }

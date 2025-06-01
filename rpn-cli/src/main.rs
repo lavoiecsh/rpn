@@ -1,23 +1,28 @@
-use std::{error, io};
-use rpn_core::number::Number;
-use rpn_core::operation::{
-    Add, Copy, Divide, Multiply, Pop, Push, Remainder, Rotate, Subtract,
-};
+use rpn_core::operation::{OpStack, OperationError, add, subtract, divide, remainder, multiply, rotate, square, copy};
 use rpn_core::stack::Stack;
 use rpn_std::stack::VecStack;
-use std::fmt::{Display, Formatter};
+use std::io;
 use std::io::Write;
-use std::str::FromStr;
+
+type N = i32;
+type S = VecStack<N>;
 
 fn main() -> Result<(), io::Error> {
-    let mut environment = CliEnvironment::<i32>::default();
+    let mut environment = CliEnvironment::default();
     let mut input = String::new();
     while !environment.exited {
         print!("> ");
         io::stdout().flush()?;
         io::stdin().read_line(&mut input)?;
-        for operation in input.split_whitespace() {
-            environment.evaluate(operation);
+        for operation in input.split_whitespace().map(parse_input) {
+            match operation {
+                ParsedInput::Operation(o) => environment.evaluate(o),
+                ParsedInput::Push(n) => environment.push(n),
+                ParsedInput::Exit => {
+                    environment.exited = true;
+                }
+                ParsedInput::Unknown(o) => println!("Unknown command: {o}"),
+            }
         }
         input.clear();
         environment.print();
@@ -25,70 +30,56 @@ fn main() -> Result<(), io::Error> {
     Ok(())
 }
 
-struct CliEnvironment<N: Number> {
-    stack: VecStack<N>,
-    exited: bool,
-}
-
-impl<N: Number> Default for CliEnvironment<N> {
-    fn default() -> Self {
-        Self {
-            stack: VecStack::default(),
-            exited: false,
-        }
+fn parse_input(input: &str) -> ParsedInput {
+    match input {
+        "+" | "add" => ParsedInput::Operation(add),
+        "-" | "subtract" => ParsedInput::Operation(subtract),
+        "*" | "multiply" => ParsedInput::Operation(multiply),
+        "/" | "divide" => ParsedInput::Operation(divide),
+        "%" | "remainder" => ParsedInput::Operation(remainder),
+        "^2" | "square" => ParsedInput::Operation(square),
+        "rotate" => ParsedInput::Operation(rotate),
+        "copy" => ParsedInput::Operation(copy),
+        "exit" => ParsedInput::Exit,
+        _ => match input.parse() {
+            Ok(n) => ParsedInput::Push(n),
+            Err(..) => ParsedInput::Unknown(input.to_owned()),
+        },
     }
 }
 
-impl<N: Number + Display + FromStr> CliEnvironment<N> {
+enum ParsedInput {
+    Operation(fn(OpStack<S>) -> Result<OpStack<S>, OperationError>),
+    Unknown(String),
+    Push(N),
+    Exit,
+}
+
+#[derive(Default)]
+struct CliEnvironment {
+    stack: S,
+    exited: bool,
+}
+
+impl CliEnvironment {
     fn print(&self) {
         self.stack
             .iter()
             .enumerate()
             .for_each(|(i, v)| println!("{i:2}: {v}"));
     }
-    
-    fn evaluate(&mut self, input: &str) {
-        match input {
-            "exit" => self.exited = true,
-            _ => match self.evaluate_result(input) {
-                Ok(new_stack) => {
-                    self.stack = new_stack;
-                }
-                Err(e) => {
-                    println!("{e}");
-                }
-            }
+
+    fn evaluate(&mut self, f: fn(OpStack<S>) -> Result<OpStack<S>, OperationError>) {
+        match self.stack.evaluate(f) {
+            Ok(new_stack) => self.stack = new_stack,
+            Err(e) => println!("{e}"),
         }
     }
 
-    fn evaluate_result(&self, input: &str) -> Result<VecStack<N>, Box<dyn error::Error>> {
-        match input {
-            "+" => Ok(self.stack.evaluate(Add)?),
-            "-" => Ok(self.stack.evaluate(Subtract)?),
-            "*" => Ok(self.stack.evaluate(Multiply)?),
-            "/" => Ok(self.stack.evaluate(Divide)?),
-            "%" => Ok(self.stack.evaluate(Remainder)?),
-            "pop" => Ok(self.stack.evaluate(Pop)?),
-            "rot" => Ok(self.stack.evaluate(Rotate)?),
-            "copy" => Ok(self.stack.evaluate(Copy)?),
-            _ => {
-                if let Ok(n) = input.parse::<N>() {
-                    Ok(self.stack.evaluate(Push(n))?)
-                } else {
-                    Err(Box::new(CliError(format!("Invalid operation: {input}"))))
-                }
-            }
+    fn push(&mut self, n: N) {
+        match self.stack.push(n) {
+            Ok(()) => {}
+            Err(e) => println!("{e}"),
         }
     }
 }
-
-#[derive(Debug)]
-struct CliError(String);
-
-impl Display for CliError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
-impl error::Error for CliError {}

@@ -1,35 +1,40 @@
-use crate::number::Number;
+use core::fmt::Debug;
 use crate::stack::{Stack, StackError};
 
 #[derive(Clone, Debug)]
-pub struct SmallStack<N: Number> {
+pub struct SmallStack<N> {
     a: Option<N>,
     b: Option<N>,
 }
 
-impl<N: Number> Default for SmallStack<N> {
+impl<N> Default for SmallStack<N> {
     fn default() -> Self {
         Self { a: None, b: None }
     }
 }
 
-impl<N: Number> SmallStack<N> {
-    #[cfg(test)]
+#[cfg(test)]
+impl<N: Copy> SmallStack<N> {
+    pub(crate) fn empty() -> Self {
+        Self { a: None, b: None }
+    }
+
     pub(crate) fn one_element(a: N) -> Self {
         Self { a: Some(a), b: None }
     }
     
-    #[cfg(test)]
     pub(crate) fn two_elements(a: N, b: N) -> Self {
         Self { a: Some(a), b: Some(b) }
     }
     
-    pub fn inspect(&self) -> (Option<N>, Option<N>) {
+    pub(crate) fn inspect(&self) -> (Option<N>, Option<N>) {
         (self.a, self.b)
     }
 }
 
-impl<N: Number> Stack<N> for SmallStack<N> {
+impl<N: Copy + Debug> Stack for SmallStack<N> {
+    type Item = N;
+    
     fn size(&self) -> usize {
         match (self.a, self.b) {
             (None, None) => 0,
@@ -86,12 +91,12 @@ impl<N: Number> Stack<N> for SmallStack<N> {
     }
 }
 
-struct StackIterator<'a, N: Number> {
+struct StackIterator<'a, N> {
     a: &'a Option<N>,
     b: &'a Option<N>,
 }
 
-impl<'a, N: Number> Iterator for StackIterator<'a, N> {
+impl<'a, N: Debug> Iterator for StackIterator<'a, N> {
     type Item = &'a N;
 
     fn next(&mut self) -> Option<Self::Item> {

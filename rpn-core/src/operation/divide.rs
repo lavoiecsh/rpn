@@ -1,29 +1,14 @@
 use crate::number::Number;
-use crate::operation::{Operation, OperationError};
+use crate::operation::{OpStack, OperationError};
 use crate::stack::Stack;
 
 /// Divides the first number on the stack by the second number and pushes back the result
-/// ```
-/// # use rpn_core::operation::{Divide, Operation, OperationError, Push};
-/// # use rpn_core::stack::{SmallStack, Stack};
-/// let stack = SmallStack::<i32>::default()
-///     .evaluate(Push(2))?
-///     .evaluate(Push(6))?
-///     .evaluate(Divide)?;
-/// assert_eq!(stack.size(), 1);
-/// assert_eq!(stack.iter().next().unwrap(), &3);
-/// # Ok::<(), OperationError>(())
-/// ```
-pub struct Divide;
-
-impl<N: Number> Operation<N> for Divide {
-    fn evaluate(&self, stack: &mut impl Stack<N>) -> Result<(), OperationError> {
-        let a = stack.pop()?;
-        let b = stack.pop()?;
-        let c = a.divide(&b)?;
-        stack.push(c)?;
-        Ok(())
-    }
+pub fn divide<S>(stack: OpStack<S>) -> Result<OpStack<S>, OperationError>
+where
+    S: Stack,
+    S::Item: Number,
+{
+    stack.pop()?.pop()?.combine(Number::divide)?.push()
 }
 
 #[cfg(test)]
@@ -36,28 +21,31 @@ mod tests {
     #[test]
     fn div_errs_on_0_element_stack() {
         let stack = SmallStack::<i32>::default();
-        let result = stack.evaluate(Divide);
+        let result = stack.evaluate(divide);
         assert_matches!(result, Err(OperationError::Stack(StackError::Empty)));
     }
 
     #[test]
     fn div_errs_on_1_element_stack() {
         let stack = SmallStack::<i32>::one_element(1);
-        let result = stack.evaluate(Divide);
+        let result = stack.evaluate(divide);
         assert_matches!(result, Err(OperationError::Stack(StackError::Empty)));
     }
 
     #[test]
     fn div_errs_on_division_by_zero() {
-        let stack = SmallStack::<i32>::two_elements(0, 6);
-        let result = stack.evaluate(Divide);
-        assert_matches!(result, Err(OperationError::Number(NumberError::DivisionByZero)));
+        let stack = SmallStack::<i32>::two_elements(6, 0);
+        let result = stack.evaluate(divide);
+        assert_matches!(
+            result,
+            Err(OperationError::Number(NumberError::DivisionByZero))
+        );
     }
 
     #[test]
     fn div_pushes_result_of_division() {
-        let stack = SmallStack::<i32>::two_elements(2, 6);
-        let result = stack.evaluate(Divide);
+        let stack = SmallStack::<i32>::two_elements(6, 2);
+        let result = stack.evaluate(divide);
         assert_matches!(result.unwrap().inspect(), (Some(3), None));
     }
 }

@@ -1,24 +1,25 @@
-use crate::number::Number;
 use crate::stack::{Stack, StackError};
 
 const MAX_STACK_SIZE: usize = 1024;
 
 #[derive(Clone)]
-pub struct LargeStack<N: Number> {
+pub struct LargeStack<N> {
     stack: [N; MAX_STACK_SIZE],
     top: usize,
 }
 
-impl<N: Number> Default for LargeStack<N> {
+impl<N: Default + Copy> Default for LargeStack<N> {
     fn default() -> Self {
         Self {
-            stack: [N::ZERO; MAX_STACK_SIZE],
+            stack: [N::default(); MAX_STACK_SIZE],
             top: 0,
         }
     }
 }
 
-impl<N: Number> Stack<N> for LargeStack<N> {
+impl<N: Copy> Stack for LargeStack<N> {
+    type Item = N;
+    
     fn size(&self) -> usize {
         self.top
     }

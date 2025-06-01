@@ -6,21 +6,20 @@ use core::fmt::{Display, Formatter};
 pub use large::LargeStack;
 pub use small::SmallStack;
 
-use crate::number::Number;
-use crate::operation::{Operation, OperationError};
+use crate::operation::{NoItems, OperationError, OperationStack};
 
-pub trait Stack<N: Number>: Clone {
+pub trait Stack: Clone {
+    type Item: Clone;
+    
     fn size(&self) -> usize;
-    fn iter<'a>(&'a self) -> impl Iterator<Item = &'a N>
+    fn iter<'a>(&'a self) -> impl Iterator<Item = &'a Self::Item>
     where
-        N: 'a;
-    fn push(&mut self, value: N) -> Result<(), StackError>;
-    fn pop(&mut self) -> Result<N, StackError>;
-
-    fn evaluate(&self, operation: impl Operation<N>) -> Result<Self, OperationError> {
-        let mut stack = self.clone();
-        operation.evaluate(&mut stack)?;
-        Ok(stack)
+        Self::Item: 'a;
+    fn push(&mut self, value: Self::Item) -> Result<(), StackError>;
+    fn pop(&mut self) -> Result<Self::Item, StackError>;
+    
+    fn evaluate(&self, operation: impl FnOnce(OperationStack<Self, NoItems>) -> Result<OperationStack<Self, NoItems>, OperationError>) -> Result<Self, OperationError> {
+        operation(OperationStack::new(self.clone())).map(OperationStack::stack)
     }
 }
 
