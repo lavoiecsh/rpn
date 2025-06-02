@@ -8,52 +8,33 @@
             background-color: dimgrey;
             color: lightgrey;
         }
+
         input {
             background-color: dimgrey;
             color: lightgrey;
         }
     </style>
     <script type="module">
-        import init, {WasmStack} from './pkg/rpn_wasm.js';
+        import init, {WasmEnvironment} from './pkg/rpn_wasm.js';
 
         await init();
-
-        const stack = new WasmStack();
-        let number = undefined;
-
-        function push() {
-            if (number === undefined) {
-                return;
-            }
-            stack.push(number);
-            number = undefined;
-        }
-
-        function evaluate(event) {
-            if ('0123456789'.includes(event.data)) {
-                if (number === undefined) {
-                    number = 0;
-                }
-                number *= 10;
-                number += event.data - '0';
-                return;
-            }
-            push();
-            stack.evaluate(event.data);
-            document.getElementById('input').value = '';
-            document.getElementById('stack').innerHTML = stack.stack().join('<br/>');
-            document.getElementById('history').innerHTML = stack.history().join('<br/>');
-        }
-
-        document.getElementById('input').addEventListener('input', evaluate);
+        const stack = new WasmEnvironment();
+        document.getElementById('input').addEventListener('input', stack.evaluate.bind(stack));
         document.getElementById('input').focus();
     </script>
 </head>
 <body>
-<div id="stack"></div>
 <div>
-    <label for="input"></label><input id="input" type="text">
+    <table>
+        <tbody id="stack"></tbody>
+    </table>
 </div>
-<div id="history"></div>
+<div>
+    <!--suppress HtmlFormInputWithoutLabel -->
+    <input id="input" type="text">
+</div>
+<div>
+    <ul id="history"></ul>
+</div>
 </body>
 </html>
